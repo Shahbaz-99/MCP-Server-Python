@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "mcp-hub": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "--directory", "S:\\MCP-Server-Python", "mcp-hub"],
+      "env": {
+        "MCP_HUB_ENABLED_PLUGINS": "[\"sample\"]"
+      }
+    }
+  }
+}

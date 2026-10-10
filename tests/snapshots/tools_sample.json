@@ -1,0 +1,125 @@
+[
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": false,
+      "open_world_hint": false,
+      "read_only_hint": true,
+      "title": "current_time"
+    },
+    "description": "Current date and time in an IANA timezone (default UTC), ISO 8601.",
+    "input_schema": {
+      "properties": {
+        "timezone": {
+          "default": "UTC",
+          "maxLength": 64,
+          "title": "Timezone",
+          "type": "string"
+        }
+      },
+      "title": "current_timeArguments",
+      "type": "object"
+    },
+    "name": "current_time"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": false,
+      "read_only_hint": true,
+      "title": "echo"
+    },
+    "description": "Return the given message unchanged. Useful to test connectivity.",
+    "input_schema": {
+      "properties": {
+        "message": {
+          "maxLength": 10000,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "echoArguments",
+      "type": "object"
+    },
+    "name": "echo"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": false,
+      "read_only_hint": true,
+      "title": "safe_fs_list"
+    },
+    "description": "List entries of a directory inside a configured sandbox root.",
+    "input_schema": {
+      "properties": {
+        "path": {
+          "default": "",
+          "maxLength": 1024,
+          "title": "Path",
+          "type": "string"
+        },
+        "root": {
+          "anyOf": [
+            {
+              "maxLength": 255,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Root"
+        }
+      },
+      "title": "safe_fs_listArguments",
+      "type": "object"
+    },
+    "name": "safe_fs_list"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": false,
+      "read_only_hint": true,
+      "title": "safe_fs_read"
+    },
+    "description": "Read a UTF-8 text file inside a configured sandbox root (size-capped).",
+    "input_schema": {
+      "properties": {
+        "path": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "root": {
+          "anyOf": [
+            {
+              "maxLength": 255,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Root"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "safe_fs_readArguments",
+      "type": "object"
+    },
+    "name": "safe_fs_read"
+  }
+]
