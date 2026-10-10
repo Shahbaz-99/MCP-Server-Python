@@ -42,7 +42,7 @@ jobs:
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: .
           load: true
@@ -64,7 +64,7 @@ jobs:
           image: mcp-hub:scan
           format: cyclonedx-json
           output-file: sbom.cdx.json
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: .
           push: true
