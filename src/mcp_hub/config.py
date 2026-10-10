@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 from pydantic import BaseModel, Field, SecretStr, field_validator
@@ -81,17 +81,32 @@ class SqlSettings(BaseModel):
     connections: dict[str, SqlConnection] = Field(default_factory=dict)
 
 
+class RestParam(BaseModel):
+    type: Literal["string", "integer", "number", "boolean"] = "string"
+    description: str = ""
+    required: bool = True
+    default: str | int | float | bool | None = None
+    max_length: int = Field(1000, ge=1, le=10_000)  # strings only
+
+
 class RestEndpoint(BaseModel):
-    name: str = Field(pattern=r"^[a-z][a-z0-9_]{0,63}$")
-    description: str
-    method: str = Field("GET", pattern=r"^(GET|POST|PUT|PATCH|DELETE)$")
+    """One REST call exposed as one MCP tool named `rest_<name>`.
+
+    `url` may contain `{param}` placeholders in the path or query, never in scheme/host/port.
+    `query` and `body` values may be `{param}` placeholders or literals.
+    """
+
+    name: str = Field(pattern=r"^[a-z][a-z0-9_]{0,59}$")
+    description: str = Field(min_length=1)
+    method: Literal["GET", "POST", "PUT", "PATCH", "DELETE"] = "GET"
     url: str
-    params: dict[str, str] = Field(default_factory=dict)
-    auth_type: str = Field("none", pattern=r"^(none|header|bearer|basic|query)$")
-    auth_name: str | None = None
-    auth_secret_env: str | None = None
-    response_path: str | None = None
-    read_only: bool = True
+    params: dict[str, RestParam] = Field(default_factory=dict)
+    query: dict[str, str] = Field(default_factory=dict)
+    body: dict[str, Any] | None = None
+    auth_type: Literal["none", "header", "bearer", "basic", "query"] = "none"
+    auth_name: str | None = None  # header or query parameter name
+    auth_secret_env: str | None = None  # NAME of the env var holding the secret (never the secret)
+    response_path: str | None = None  # dotted path into the JSON response, e.g. data.items.0
 
 
 class RestSettings(BaseModel):
