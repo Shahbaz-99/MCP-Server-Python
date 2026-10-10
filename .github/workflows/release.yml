@@ -48,7 +48,7 @@ jobs:
           load: true
           tags: mcp-hub:scan
       - name: Scan image (fail on unaddressed high/critical)
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: mcp-hub:scan
           severity: HIGH,CRITICAL
