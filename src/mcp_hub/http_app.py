@@ -131,6 +131,8 @@ def build_http_stack(
 def run_http(settings: Settings) -> None:
     stack = build_http_stack(settings)
     h = settings.http
+    for warning in settings.public_bind_warnings():
+        _log.warning(warning)
     _log.info(
         "starting http transport on %s:%d auth=%s plugins=%s",
         h.host,

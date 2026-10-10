@@ -280,6 +280,41 @@ async def test_pg_layer2_read_only_and_caps(pg_engine: PostgresEngine) -> None:
 
 
 @pg
+async def test_pg_through_the_mcp_tool_with_guard_and_params(pg_engine: PostgresEngine) -> None:
+    assert PG_URL
+    settings = Settings(
+        enabled_plugins=["sql"], sql={"connections": {"pg": {"url": PG_URL, "timeout_seconds": 2}}}
+    )
+    built = build_server(settings, local_trusted=True)
+    async with Client(built.server) as c:
+        err, out = await _call(
+            c,
+            "sql_run_query",
+            {
+                "connection": "pg",
+                "query": "SELECT name FROM mcp_hub_t WHERE id = $1",
+                "params": [3],
+            },
+        )
+        assert not err and out["rows"] == [["c"]]
+        for evil in (
+            "SELECT pg_sleep(30)",
+            "SELECT nextval('x')",
+            "DELETE FROM mcp_hub_t",
+            "SELECT 1; DROP TABLE mcp_hub_t",
+            "WITH d AS (DELETE FROM mcp_hub_t RETURNING *) SELECT * FROM d",
+            "SELECT * FROM mcp_hub_t FOR UPDATE",
+        ):
+            err, _ = await _call(c, "sql_run_query", {"connection": "pg", "query": evil})
+            assert err, evil
+        err, out = await _call(
+            c, "sql_run_query", {"connection": "pg", "query": "SELECT count(*) FROM mcp_hub_t"}
+        )
+        assert not err and out["rows"] == [[3]]  # nothing was modified
+    await built.registrar.run_shutdown()
+
+
+@pg
 async def test_pg_unreachable_is_clean_error() -> None:
     eng = PostgresEngine(
         "postgresql://u:secretpw@127.0.0.1:1/db", SqlConnection(url=SecretStr("postgresql://x"))

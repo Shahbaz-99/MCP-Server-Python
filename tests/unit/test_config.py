@@ -94,11 +94,13 @@ def test_http_invariants() -> None:
         Settings(http={"host": "0.0.0.0"}).check_http_invariants()
     with pytest.raises(ValueError, match="without authentication"):
         Settings(http={"host": "0.0.0.0", "allow_public_bind": True}).check_http_invariants()
-    with pytest.raises(ValueError, match="allowed_hosts"):
-        Settings(
-            auth={"enabled": True, "resource_url": RES, "api_key_file": "k.json"},
-            http={"host": "0.0.0.0", "allow_public_bind": True},
-        ).check_http_invariants()
+    container_style = Settings(
+        auth={"enabled": True, "resource_url": RES, "api_key_file": "k.json"},
+        http={"host": "0.0.0.0", "allow_public_bind": True},
+    )
+    container_style.check_http_invariants()  # allowed: a container binds 0.0.0.0 inside
+    assert "allowed_hosts" in container_style.public_bind_warnings()[0]  # ...but we warn
+    assert Settings().public_bind_warnings() == []
     Settings(
         auth={"enabled": True, "resource_url": RES, "api_key_file": "k.json"},
         http={

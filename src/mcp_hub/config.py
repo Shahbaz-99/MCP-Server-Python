@@ -201,10 +201,18 @@ class Settings(BaseSettings):
                 )
             if not self.auth.enabled:
                 raise ValueError("refusing public bind without authentication (auth.enabled)")
-            if all(_is_loopback_host(x.rsplit(":", 1)[0]) for x in h.allowed_hosts):
-                raise ValueError(
-                    "public bind needs http.allowed_hosts to list the public host name(s)"
-                )
+
+    def public_bind_warnings(self) -> list[str]:
+        """Non-fatal hints: unmatched Host headers fail closed, but the operator should know."""
+        h = self.http
+        if not _is_loopback_host(h.host) and all(
+            _is_loopback_host(x.rsplit(":", 1)[0]) for x in h.allowed_hosts
+        ):
+            return [
+                "http.allowed_hosts only lists loopback names: requests that use the server's "
+                "public host name will be rejected (set MCP_HUB_HTTP__ALLOWED_HOSTS)"
+            ]
+        return []
 
 
 def _is_loopback_host(host: str) -> bool:

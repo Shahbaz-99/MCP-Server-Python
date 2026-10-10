@@ -1,0 +1,37 @@
+# Local HTTP mode. The port is published on loopback only; put TLS and a reverse proxy in front for
+# anything reachable from other machines.
+#
+# First run:
+#   docker compose run --rm mcp-hub keys create --label laptop --scopes sample:read
+#   docker compose up -d
+services:
+  mcp-hub:
+    build: .
+    image: mcp-hub:local
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      MCP_HUB_AUTH__ENABLED: "true"
+      MCP_HUB_AUTH__RESOURCE_URL: "http://localhost:8000/mcp"
+      MCP_HUB_HTTP__ALLOWED_HOSTS: '["localhost:*","127.0.0.1:*"]'
+      MCP_HUB_ENABLED_PLUGINS: '["sample"]'
+      MCP_HUB_SAMPLE__FS_ROOTS: '["/sandbox"]'
+      MCP_HUB_LOG_LEVEL: "INFO"
+    volumes:
+      - mcp-hub-data:/data
+      - ./data/sandbox:/sandbox:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/readyz', timeout=3)"]
+      interval: 15s
+      timeout: 4s
+      retries: 3
+
+volumes:
+  mcp-hub-data:
