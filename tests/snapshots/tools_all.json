@@ -5,6 +5,32 @@
       "idempotent_hint": false,
       "open_world_hint": false,
       "read_only_hint": true,
+      "title": "countdown"
+    },
+    "description": "Count down from N seconds, reporting progress each second. Demonstrates progress notifications and cancellation for long-running tools.",
+    "input_schema": {
+      "properties": {
+        "seconds": {
+          "maximum": 30,
+          "minimum": 1,
+          "title": "Seconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "seconds"
+      ],
+      "title": "countdownArguments",
+      "type": "object"
+    },
+    "name": "countdown"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": false,
+      "open_world_hint": false,
+      "read_only_hint": true,
       "title": "current_time"
     },
     "description": "Current date and time in an IANA timezone (default UTC), ISO 8601.",

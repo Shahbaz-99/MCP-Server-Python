@@ -17,6 +17,7 @@ from mcp_types import ToolAnnotations
 from mcp_hub import observability as obs
 from mcp_hub.config import Settings
 from mcp_hub.errors import ConfigError, HubError, ToolTimeout, to_public_message
+from mcp_hub.observability import get_tracer
 from mcp_hub.security.audit import record_tool_call
 from mcp_hub.security.identity import IdentityResolver
 
@@ -84,8 +85,17 @@ class Registrar:
                 try:
                     ident = self._resolver.require(scopes)
                     ident_subject, ident_kind = ident.subject, ident.kind
-                    async with asyncio.timeout(limit):
-                        return await fn(*args, **kwargs)
+                    with get_tracer().start_as_current_span(
+                        f"tool {name}",
+                        attributes={"mcp.tool": name, "mcp.plugin": self.plugin},
+                        record_exception=False,  # exception text could contain user data
+                        set_status_on_exception=False,
+                    ):
+                        async with asyncio.timeout(limit):
+                            return await fn(*args, **kwargs)
+                except asyncio.CancelledError:
+                    outcome = "cancelled"  # client cancelled or the server is shutting down
+                    raise
                 except TimeoutError:
                     outcome, code = "error", ToolTimeout.code
                     raise ToolError(f"Tool timed out after {limit:g}s.") from None

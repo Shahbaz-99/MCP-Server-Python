@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import asyncio
 import datetime as dt
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+from mcp.server.mcpserver import Context
 from pydantic import Field
 
 from mcp_hub.errors import AccessDenied, ConfigError, LimitExceeded, NotFound, ValidationFailed
@@ -67,6 +69,23 @@ def register(registrar: Registrar) -> None:
                 "Unknown timezone. Use an IANA name such as Europe/Paris."
             ) from None
         return dt.datetime.now(tz).isoformat()
+
+    @registrar.tool(
+        name="countdown",
+        description=(
+            "Count down from N seconds, reporting progress each second. Demonstrates progress "
+            "notifications and cancellation for long-running tools."
+        ),
+        scopes=(SCOPE_READ,),
+        read_only=True,
+        idempotent=False,
+    )
+    async def countdown(seconds: Annotated[int, Field(ge=1, le=30)], ctx: Context[Any, Any]) -> str:
+        for done in range(seconds):
+            await ctx.report_progress(done, seconds, f"{seconds - done}s left")
+            await asyncio.sleep(1)
+        await ctx.report_progress(seconds, seconds, "done")
+        return "done"
 
     @registrar.tool(
         name="safe_fs_list",

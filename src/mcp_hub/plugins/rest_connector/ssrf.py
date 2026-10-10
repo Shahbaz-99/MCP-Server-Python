@@ -32,7 +32,7 @@ def is_public(ip: IPAddress) -> bool:
             return False
         if ip.teredo is not None:
             return False
-    return ip.is_global and not ip.is_multicast
+    return ip.is_global and not ip.is_multicast and not ip.is_reserved
 
 
 def host_allowed(host: str, allowed: list[str]) -> bool:

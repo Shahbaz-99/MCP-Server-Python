@@ -45,7 +45,7 @@ def _text(result: object) -> str:
 async def test_full_flow(sandbox: Path) -> None:
     async with Client(_params(sandbox)) as client:
         tools = {t.name: t for t in (await client.list_tools()).tools}
-        assert set(tools) == {"echo", "current_time", "safe_fs_list", "safe_fs_read"}
+        assert set(tools) == {"echo", "current_time", "countdown", "safe_fs_list", "safe_fs_read"}
         for t in tools.values():
             assert t.annotations is not None
             assert t.annotations.read_only_hint is True

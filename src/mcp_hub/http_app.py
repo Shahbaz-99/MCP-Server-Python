@@ -95,6 +95,7 @@ def build_http_stack(
 
     starlette = server.streamable_http_app(
         stateless_http=True,
+        json_response=h.json_response,
         transport_security=TransportSecuritySettings(
             enable_dns_rebinding_protection=True,
             allowed_hosts=list(h.allowed_hosts),

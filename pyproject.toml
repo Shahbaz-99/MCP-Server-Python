@@ -20,6 +20,12 @@ dependencies = [
     "tzdata>=2024.1",
 ]
 
+[project.optional-dependencies]
+otel = [
+    "opentelemetry-sdk>=1.28",
+    "opentelemetry-exporter-otlp-proto-http>=1.28",
+]
+
 [project.scripts]
 mcp-hub = "mcp_hub.__main__:main"
 
@@ -41,6 +47,8 @@ dev = [
     "types-pyyaml",
     "pip-audit>=2.7",
     "cryptography>=43",
+    "psutil>=6",
+    "opentelemetry-sdk>=1.28",
 ]
 
 [tool.ruff]
@@ -62,7 +70,7 @@ files = ["src", "tests"]
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["asyncpg", "asyncpg.*"]
+module = ["asyncpg", "asyncpg.*", "psutil", "psutil.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]

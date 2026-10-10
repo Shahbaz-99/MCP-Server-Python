@@ -43,6 +43,8 @@ PUBLIC = "93.184.216.34"
         "255.255.255.255",
         "::1",
         "::",
+        "::2",  # IETF-reserved block that Python still reports as is_global
+        "::8",
         "fe80::1",
         "fc00::1",
         "fd00:ec2::254",  # AWS IPv6 metadata

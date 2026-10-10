@@ -64,4 +64,4 @@ async def test_all_plugin_tools_match_snapshot(tmp_path: Path, monkeypatch: Any)
         SNAPSHOT.write_text(json.dumps(current, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     expected = json.loads(SNAPSHOT.read_text(encoding="utf-8"))
     assert json.loads(json.dumps(current, sort_keys=True)) == expected
-    assert len(current) == 4 + 4 + 2 + 10  # sample + sql + rest + github(with writes)
+    assert len(current) == 5 + 4 + 2 + 10  # sample + sql + rest + github(with writes)

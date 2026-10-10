@@ -29,6 +29,7 @@ class HttpSettings(BaseModel):
     max_concurrency: int = Field(64, ge=1)
     metrics_requires_auth: bool = True
     forwarded_allow_ips: str | None = None  # trusted proxy IPs for X-Forwarded-For (uvicorn)
+    json_response: bool = False  # reply with plain JSON instead of an SSE stream (no streaming)
 
 
 class AuthSettings(BaseModel):
@@ -147,6 +148,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     tool_timeout_seconds: float = Field(30.0, gt=0)
     shutdown_grace_seconds: float = Field(10.0, ge=0)
+    tracing_enabled: bool = False
     enabled_plugins: list[str] = Field(default_factory=lambda: ["sample"])
     http: HttpSettings = Field(default_factory=HttpSettings)
     auth: AuthSettings = Field(default_factory=AuthSettings)

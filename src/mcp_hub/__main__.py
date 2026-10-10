@@ -16,6 +16,7 @@ import anyio
 from mcp_hub.config import CONFIG_FILE_ENV, Settings, masked_dump
 from mcp_hub.errors import ConfigError, HubError
 from mcp_hub.logging import configure_logging
+from mcp_hub.observability import setup_tracing
 from mcp_hub.security.apikeys import KeyStore
 from mcp_hub.server import BuiltServer, build_server
 
@@ -138,6 +139,8 @@ def main(argv: list[str] | None = None) -> int:
 
     configure_logging(settings.log_level)
     try:
+        if settings.tracing_enabled:
+            setup_tracing(settings.server_name)
         if args.transport == "stdio":
             built = build_server(settings, local_trusted=True)
             _log.info("starting stdio transport; plugins=%s", built.plugins)
