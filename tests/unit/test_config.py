@@ -53,21 +53,60 @@ def test_auth_requires_fields() -> None:
         Settings(auth={"enabled": True}).check_startup_invariants()
 
 
-def test_auth_issuer_must_be_https() -> None:
-    bad = Settings(
-        auth={
-            "enabled": True,
-            "issuer": "http://evil.example",
-            "audience": "a",
-            "resource_url": "r",
-        }
-    )
-    with pytest.raises(ValueError, match="https"):
-        bad.check_startup_invariants()
-    ok = Settings(
-        auth={"enabled": True, "issuer": "http://localhost:9", "audience": "a", "resource_url": "r"}
-    )
-    ok.check_startup_invariants()
+RES = "https://mcp.example.com/mcp"
+
+
+def _auth(**kw: object) -> Settings:
+    return Settings(auth={"enabled": True, "resource_url": RES, **kw})
+
+
+def test_auth_urls_must_be_https_or_loopback() -> None:
+    with pytest.raises(ValueError, match=r"auth\.issuer must be https"):
+        _auth(issuer="http://evil.example", audience="a").check_startup_invariants()
+    with pytest.raises(ValueError, match=r"auth\.jwks_url"):
+        _auth(
+            issuer="https://i.example", audience="a", jwks_url="http://evil.example/k"
+        ).check_startup_invariants()
+    with pytest.raises(ValueError, match=r"auth\.resource_url"):
+        Settings(
+            auth={"enabled": True, "resource_url": "http://evil.example/mcp", "api_key_file": "k"}
+        ).check_startup_invariants()
+    _auth(issuer="http://localhost:9", audience="a").check_startup_invariants()
+
+
+def test_auth_combinations() -> None:
+    with pytest.raises(ValueError, match="together"):
+        _auth(issuer="https://i.example").check_startup_invariants()
+    with pytest.raises(ValueError, match="api_key_file"):
+        _auth().check_startup_invariants()
+    _auth(api_key_file="k.json").check_startup_invariants()  # api-key-only is valid
+
+
+@pytest.mark.parametrize("alg", ["HS256", "none", "HS512", ""])
+def test_symmetric_jwt_algorithms_rejected(alg: str) -> None:
+    with pytest.raises(ValidationError):
+        Settings(auth={"algorithms": [alg]})
+
+
+def test_http_invariants() -> None:
+    Settings().check_http_invariants()  # loopback default is fine
+    with pytest.raises(ValueError, match="allow_public_bind"):
+        Settings(http={"host": "0.0.0.0"}).check_http_invariants()
+    with pytest.raises(ValueError, match="without authentication"):
+        Settings(http={"host": "0.0.0.0", "allow_public_bind": True}).check_http_invariants()
+    with pytest.raises(ValueError, match="allowed_hosts"):
+        Settings(
+            auth={"enabled": True, "resource_url": RES, "api_key_file": "k.json"},
+            http={"host": "0.0.0.0", "allow_public_bind": True},
+        ).check_http_invariants()
+    Settings(
+        auth={"enabled": True, "resource_url": RES, "api_key_file": "k.json"},
+        http={
+            "host": "0.0.0.0",
+            "allow_public_bind": True,
+            "allowed_hosts": ["mcp.example.com"],
+        },
+    ).check_http_invariants()
 
 
 def test_yaml_must_be_mapping(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

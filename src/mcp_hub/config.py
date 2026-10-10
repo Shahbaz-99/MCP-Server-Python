@@ -28,6 +28,7 @@ class HttpSettings(BaseModel):
     rate_limit_per_minute: int = Field(120, ge=1)
     max_concurrency: int = Field(64, ge=1)
     metrics_requires_auth: bool = True
+    forwarded_allow_ips: str | None = None  # trusted proxy IPs for X-Forwarded-For (uvicorn)
 
 
 class AuthSettings(BaseModel):
@@ -40,6 +41,15 @@ class AuthSettings(BaseModel):
     required_scopes: list[str] = Field(default_factory=list)
     clock_skew_seconds: int = Field(30, ge=0, le=300)
     jwks_cache_seconds: int = Field(600, ge=1)
+
+    @field_validator("algorithms")
+    @classmethod
+    def _asymmetric_only(cls, v: list[str]) -> list[str]:
+        bad = [a for a in v if not a.startswith(("RS", "ES", "PS")) and a != "EdDSA"]
+        if bad or not v:
+            raise ValueError(f"only asymmetric JWT algorithms are allowed, got: {bad or 'none'}")
+        return v
+
     api_key_file: Path | None = None
 
 
@@ -151,21 +161,46 @@ class Settings(BaseSettings):
 
     def check_startup_invariants(self) -> None:
         """Fail fast on unsafe or inconsistent combinations."""
-        if self.auth.enabled:
-            missing = [
-                n for n in ("issuer", "audience", "resource_url") if not getattr(self.auth, n)
-            ]
-            if missing and not self.auth.api_key_file:
-                raise ValueError(f"auth.enabled requires: {', '.join(missing)} (or api_key_file)")
-            issuer = self.auth.issuer
-            if issuer and not issuer.startswith("https://") and not _is_loopback_url(issuer):
-                raise ValueError("auth.issuer must be https")
+        a = self.auth
+        if a.enabled:
+            if not a.resource_url:
+                raise ValueError("auth.enabled requires: resource_url")
+            if bool(a.issuer) != bool(a.audience):
+                raise ValueError("auth.enabled requires issuer and audience together")
+            if not a.issuer and not a.api_key_file:
+                raise ValueError("auth.enabled requires: issuer+audience and/or api_key_file")
+            for name in ("issuer", "jwks_url", "resource_url"):
+                url = getattr(a, name)
+                if url and not _is_https_or_loopback(url):
+                    raise ValueError(f"auth.{name} must be https")
+
+    def check_http_invariants(self) -> None:
+        """Extra rules that only apply when serving over HTTP."""
+        h = self.http
+        if not _is_loopback_host(h.host):
+            if not h.allow_public_bind:
+                raise ValueError(
+                    f"refusing to bind {h.host}: non-loopback binding needs allow_public_bind"
+                )
+            if not self.auth.enabled:
+                raise ValueError("refusing public bind without authentication (auth.enabled)")
+            if all(_is_loopback_host(x.rsplit(":", 1)[0]) for x in h.allowed_hosts):
+                raise ValueError(
+                    "public bind needs http.allowed_hosts to list the public host name(s)"
+                )
 
 
-def _is_loopback_url(url: str) -> bool:
+def _is_loopback_host(host: str) -> bool:
+    return host.strip("[]") in {"127.0.0.1", "localhost", "::1"}
+
+
+def _is_https_or_loopback(url: str) -> bool:
     from urllib.parse import urlparse
 
-    return (urlparse(url).hostname or "") in {"127.0.0.1", "localhost", "::1"}
+    parsed = urlparse(url)
+    return parsed.scheme == "https" or (
+        parsed.scheme == "http" and _is_loopback_host(parsed.hostname or "")
+    )
 
 
 def masked_dump(settings: Settings) -> dict[str, Any]:

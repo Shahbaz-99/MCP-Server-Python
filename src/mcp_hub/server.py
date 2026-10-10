@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Any
 
@@ -38,26 +36,17 @@ def build_server(
     token_verifier: TokenVerifier | None = None,
     sdk_auth: SdkAuthSettings | None = None,
 ) -> BuiltServer:
-    holder: dict[str, Registrar] = {}
-
-    @asynccontextmanager
-    async def lifespan(_: MCPServer[Any]) -> AsyncIterator[None]:
-        try:
-            yield
-        finally:
-            await holder["registrar"].run_shutdown()
-
+    """Shutdown hooks are NOT tied to the SDK lifespan: in stateless HTTP mode that lifespan can
+    run per request. Transports call `registrar.run_shutdown()` once, at process/app shutdown."""
     server: MCPServer[Any] = MCPServer(
         name=settings.server_name,
         instructions=INSTRUCTIONS,
         version=__version__,
-        lifespan=lifespan,
         token_verifier=token_verifier,
         auth=sdk_auth,
         warn_on_duplicate_tools=True,
     )
     resolver = IdentityResolver(local_trusted=local_trusted)
     registrar = Registrar(server, settings, resolver)
-    holder["registrar"] = registrar
     plugins = register_plugins(registrar, settings.enabled_plugins)
     return BuiltServer(server=server, registrar=registrar, plugins=plugins)
