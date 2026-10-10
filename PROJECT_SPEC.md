@@ -20,7 +20,8 @@ Success means: a stranger can clone the repo, run one command, connect Claude Co
 6. Least privilege and deny-by-default. Every tool that touches the filesystem, network, database, or an external API must enforce an explicit allowlist and limits.
 7. Small commits, one per task, Conventional Commits. At every step, throughout development: stage, commit, and push to GitHub (`origin`). Push is standing-approved by the owner; never force-push. Do not deploy without the owner's explicit approval.
 8. Stdout hygiene. In stdio mode, stdout carries only JSON-RPC. All logs go to stderr. A stray `print()` is a bug.
-9. Keep scope. Build what this spec lists. Put extra ideas in `docs/BACKLOG.md`.
+9. Security is first-class, at every step. For every task, consider every aspect and edge case of security: input validation and size limits, injection (SQL, command, path traversal, SSRF, prompt injection), authn/authz, secrets handling, error and log leakage, resource exhaustion and DoS, concurrency and race conditions, encoding and Unicode tricks, dependency and supply-chain risk, and fail-closed defaults. Write adversarial tests for each, and update `docs/THREAT_MODEL.md` and `docs/SECURITY.md` when a new risk or mitigation appears. A task is not done until its security edge cases are handled and tested.
+10. Keep scope. Build what this spec lists. Put extra ideas in `docs/BACKLOG.md`.
 
 ## 2. Decisions Already Made
 
