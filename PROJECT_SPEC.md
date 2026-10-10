@@ -18,7 +18,7 @@ Success means: a stranger can clone the repo, run one command, connect Claude Co
 4. Definition of Done per phase = its Gate passes with real command output shown. Say plainly if something fails or was skipped.
 5. No secrets in the repo, ever. No real credentials in code, tests, fixtures, logs, or commits. Provide `.env.example` only.
 6. Least privilege and deny-by-default. Every tool that touches the filesystem, network, database, or an external API must enforce an explicit allowlist and limits.
-7. Small commits, one per task, Conventional Commits. Do not push or deploy without the owner's explicit approval.
+7. Small commits, one per task, Conventional Commits. At every step, throughout development: stage, commit, and push to GitHub (`origin`). Push is standing-approved by the owner; never force-push. Do not deploy without the owner's explicit approval.
 8. Stdout hygiene. In stdio mode, stdout carries only JSON-RPC. All logs go to stderr. A stray `print()` is a bug.
 9. Keep scope. Build what this spec lists. Put extra ideas in `docs/BACKLOG.md`.
 
@@ -215,7 +215,7 @@ Produce `docs/THREAT_MODEL.md` and mitigate at minimum:
 
 ## 8. Execution Phases
 
-Each phase ends with a Gate. Show real command output as evidence. Commit after each phase.
+Each phase ends with a Gate. Show real command output as evidence. Stage, commit, and push to GitHub after every step and at each phase end.
 
 ### Phase 0: Discovery and confirmation
 - Tasks: read this file; check Python 3.12+, `uv`, Docker, and git availability on this Windows machine; read the installed `mcp` SDK docs/source and the current MCP spec; confirm the open decisions in section 2 with the owner; write a short `docs/DECISIONS.md` (ADR style) recording the SDK version and spec revision.
