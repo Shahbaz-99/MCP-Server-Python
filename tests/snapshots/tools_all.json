@@ -1,0 +1,827 @@
+[
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": false,
+      "open_world_hint": false,
+      "read_only_hint": true,
+      "title": "current_time"
+    },
+    "description": "Current date and time in an IANA timezone (default UTC), ISO 8601.",
+    "input_schema": {
+      "properties": {
+        "timezone": {
+          "default": "UTC",
+          "maxLength": 64,
+          "title": "Timezone",
+          "type": "string"
+        }
+      },
+      "title": "current_timeArguments",
+      "type": "object"
+    },
+    "name": "current_time"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": false,
+      "read_only_hint": true,
+      "title": "echo"
+    },
+    "description": "Return the given message unchanged. Useful to test connectivity.",
+    "input_schema": {
+      "properties": {
+        "message": {
+          "maxLength": 10000,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "echoArguments",
+      "type": "object"
+    },
+    "name": "echo"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": false,
+      "open_world_hint": true,
+      "read_only_hint": false,
+      "title": "github_add_comment"
+    },
+    "description": "Comment on an issue or pull request.",
+    "input_schema": {
+      "properties": {
+        "body": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "title": "Body",
+          "type": "string"
+        },
+        "number": {
+          "maximum": 10000000,
+          "minimum": 1,
+          "title": "Number",
+          "type": "integer"
+        },
+        "owner": {
+          "description": "Repository owner",
+          "maxLength": 39,
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "repo": {
+          "description": "Repository name",
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Repo",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "number",
+        "body"
+      ],
+      "title": "github_add_commentArguments",
+      "type": "object"
+    },
+    "name": "github_add_comment"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": false,
+      "open_world_hint": true,
+      "read_only_hint": false,
+      "title": "github_create_issue"
+    },
+    "description": "Create an issue in an allowed repository.",
+    "input_schema": {
+      "properties": {
+        "body": {
+          "default": "",
+          "maxLength": 20000,
+          "title": "Body",
+          "type": "string"
+        },
+        "labels": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 10,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Labels"
+        },
+        "owner": {
+          "description": "Repository owner",
+          "maxLength": 39,
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "repo": {
+          "description": "Repository name",
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Repo",
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "title"
+      ],
+      "title": "github_create_issueArguments",
+      "type": "object"
+    },
+    "name": "github_create_issue"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": true,
+      "read_only_hint": true,
+      "title": "github_get_file_contents"
+    },
+    "description": "Read a text file or list a directory in an allowed repository.",
+    "input_schema": {
+      "properties": {
+        "owner": {
+          "description": "Repository owner",
+          "maxLength": 39,
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "path": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "ref": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref"
+        },
+        "repo": {
+          "description": "Repository name",
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Repo",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "path"
+      ],
+      "title": "github_get_file_contentsArguments",
+      "type": "object"
+    },
+    "name": "github_get_file_contents"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": true,
+      "read_only_hint": true,
+      "title": "github_get_issue"
+    },
+    "description": "Get one issue by number.",
+    "input_schema": {
+      "properties": {
+        "number": {
+          "maximum": 10000000,
+          "minimum": 1,
+          "title": "Number",
+          "type": "integer"
+        },
+        "owner": {
+          "description": "Repository owner",
+          "maxLength": 39,
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "repo": {
+          "description": "Repository name",
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Repo",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "number"
+      ],
+      "title": "github_get_issueArguments",
+      "type": "object"
+    },
+    "name": "github_get_issue"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": true,
+      "read_only_hint": true,
+      "title": "github_get_pull_request"
+    },
+    "description": "Get one pull request by number.",
+    "input_schema": {
+      "properties": {
+        "number": {
+          "maximum": 10000000,
+          "minimum": 1,
+          "title": "Number",
+          "type": "integer"
+        },
+        "owner": {
+          "description": "Repository owner",
+          "maxLength": 39,
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "repo": {
+          "description": "Repository name",
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Repo",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "number"
+      ],
+      "title": "github_get_pull_requestArguments",
+      "type": "object"
+    },
+    "name": "github_get_pull_request"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": true,
+      "read_only_hint": true,
+      "title": "github_get_repo"
+    },
+    "description": "Get details of an allowed repository.",
+    "input_schema": {
+      "properties": {
+        "owner": {
+          "description": "Repository owner",
+          "maxLength": 39,
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "repo": {
+          "description": "Repository name",
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Repo",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "repo"
+      ],
+      "title": "github_get_repoArguments",
+      "type": "object"
+    },
+    "name": "github_get_repo"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": true,
+      "read_only_hint": true,
+      "title": "github_list_issues"
+    },
+    "description": "List issues (and PRs) of an allowed repository.",
+    "input_schema": {
+      "properties": {
+        "owner": {
+          "description": "Repository owner",
+          "maxLength": 39,
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "page": {
+          "default": 1,
+          "maximum": 1000,
+          "minimum": 1,
+          "title": "Page",
+          "type": "integer"
+        },
+        "per_page": {
+          "default": 30,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Per Page",
+          "type": "integer"
+        },
+        "repo": {
+          "description": "Repository name",
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Repo",
+          "type": "string"
+        },
+        "state": {
+          "default": "open",
+          "enum": [
+            "open",
+            "closed",
+            "all"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "repo"
+      ],
+      "title": "github_list_issuesArguments",
+      "type": "object"
+    },
+    "name": "github_list_issues"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": true,
+      "read_only_hint": true,
+      "title": "github_list_pull_request_files"
+    },
+    "description": "List the files changed by a pull request, with patches.",
+    "input_schema": {
+      "properties": {
+        "number": {
+          "maximum": 10000000,
+          "minimum": 1,
+          "title": "Number",
+          "type": "integer"
+        },
+        "owner": {
+          "description": "Repository owner",
+          "maxLength": 39,
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "page": {
+          "default": 1,
+          "maximum": 1000,
+          "minimum": 1,
+          "title": "Page",
+          "type": "integer"
+        },
+        "per_page": {
+          "default": 30,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Per Page",
+          "type": "integer"
+        },
+        "repo": {
+          "description": "Repository name",
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Repo",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "number"
+      ],
+      "title": "github_list_pull_request_filesArguments",
+      "type": "object"
+    },
+    "name": "github_list_pull_request_files"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": true,
+      "read_only_hint": true,
+      "title": "github_list_repos"
+    },
+    "description": "List repositories of an allowed owner (only allowlisted ones are returned).",
+    "input_schema": {
+      "properties": {
+        "owner": {
+          "description": "Repository owner",
+          "maxLength": 39,
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "page": {
+          "default": 1,
+          "maximum": 1000,
+          "minimum": 1,
+          "title": "Page",
+          "type": "integer"
+        },
+        "per_page": {
+          "default": 30,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Per Page",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "owner"
+      ],
+      "title": "github_list_reposArguments",
+      "type": "object"
+    },
+    "name": "github_list_repos"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": true,
+      "read_only_hint": true,
+      "title": "github_search_issues"
+    },
+    "description": "Search issues or pull requests inside ONE allowed repository (scope qualifiers are added for you; repo:/org:/user: in the query are rejected).",
+    "input_schema": {
+      "properties": {
+        "kind": {
+          "default": "issue",
+          "enum": [
+            "issue",
+            "pr"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "owner": {
+          "description": "Repository owner",
+          "maxLength": 39,
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "page": {
+          "default": 1,
+          "maximum": 1000,
+          "minimum": 1,
+          "title": "Page",
+          "type": "integer"
+        },
+        "per_page": {
+          "default": 30,
+          "maximum": 100,
+          "minimum": 1,
+          "title": "Per Page",
+          "type": "integer"
+        },
+        "query": {
+          "maxLength": 200,
+          "minLength": 1,
+          "title": "Query",
+          "type": "string"
+        },
+        "repo": {
+          "description": "Repository name",
+          "maxLength": 100,
+          "minLength": 1,
+          "title": "Repo",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "repo",
+        "query"
+      ],
+      "title": "github_search_issuesArguments",
+      "type": "object"
+    },
+    "name": "github_search_issues"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": false,
+      "open_world_hint": true,
+      "read_only_hint": false,
+      "title": "rest_create_note"
+    },
+    "description": "Create a note.",
+    "input_schema": {
+      "properties": {
+        "title": {
+          "maxLength": 1000,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "title"
+      ],
+      "title": "rest_create_noteArguments",
+      "type": "object"
+    },
+    "name": "rest_create_note"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": true,
+      "read_only_hint": true,
+      "title": "rest_get_user"
+    },
+    "description": "Fetch a user by id.",
+    "input_schema": {
+      "properties": {
+        "user_id": {
+          "description": "User id",
+          "maxLength": 1000,
+          "title": "User Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "user_id"
+      ],
+      "title": "rest_get_userArguments",
+      "type": "object"
+    },
+    "name": "rest_get_user"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": false,
+      "read_only_hint": true,
+      "title": "safe_fs_list"
+    },
+    "description": "List entries of a directory inside a configured sandbox root.",
+    "input_schema": {
+      "properties": {
+        "path": {
+          "default": "",
+          "maxLength": 1024,
+          "title": "Path",
+          "type": "string"
+        },
+        "root": {
+          "anyOf": [
+            {
+              "maxLength": 255,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Root"
+        }
+      },
+      "title": "safe_fs_listArguments",
+      "type": "object"
+    },
+    "name": "safe_fs_list"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": false,
+      "read_only_hint": true,
+      "title": "safe_fs_read"
+    },
+    "description": "Read a UTF-8 text file inside a configured sandbox root (size-capped).",
+    "input_schema": {
+      "properties": {
+        "path": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "root": {
+          "anyOf": [
+            {
+              "maxLength": 255,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Root"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "safe_fs_readArguments",
+      "type": "object"
+    },
+    "name": "safe_fs_read"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": true,
+      "read_only_hint": true,
+      "title": "sql_describe_table"
+    },
+    "description": "Describe the columns of a table (use schema.table on PostgreSQL if needed).",
+    "input_schema": {
+      "properties": {
+        "connection": {
+          "description": "Configured connection name",
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Connection",
+          "type": "string"
+        },
+        "table": {
+          "maxLength": 257,
+          "minLength": 1,
+          "title": "Table",
+          "type": "string"
+        }
+      },
+      "required": [
+        "connection",
+        "table"
+      ],
+      "title": "sql_describe_tableArguments",
+      "type": "object"
+    },
+    "name": "sql_describe_table"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": false,
+      "read_only_hint": true,
+      "title": "sql_list_connections"
+    },
+    "description": "List configured database connections (name and engine). Start here.",
+    "input_schema": {
+      "properties": {},
+      "title": "sql_list_connectionsArguments",
+      "type": "object"
+    },
+    "name": "sql_list_connections"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": true,
+      "read_only_hint": true,
+      "title": "sql_list_tables"
+    },
+    "description": "List tables and views in a configured database connection.",
+    "input_schema": {
+      "properties": {
+        "connection": {
+          "description": "Configured connection name",
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Connection",
+          "type": "string"
+        }
+      },
+      "required": [
+        "connection"
+      ],
+      "title": "sql_list_tablesArguments",
+      "type": "object"
+    },
+    "name": "sql_list_tables"
+  },
+  {
+    "annotations": {
+      "destructive_hint": false,
+      "idempotent_hint": true,
+      "open_world_hint": true,
+      "read_only_hint": true,
+      "title": "sql_run_query"
+    },
+    "description": "Run ONE read-only SELECT query. Use positional placeholders for values: '?' on SQLite, '$1', '$2' on PostgreSQL, with values in 'params'. Results are capped in rows and bytes; 'truncated' says if a cap was hit. Writes are rejected.",
+    "input_schema": {
+      "properties": {
+        "connection": {
+          "description": "Configured connection name",
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Connection",
+          "type": "string"
+        },
+        "params": {
+          "anyOf": [
+            {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "maxItems": 50,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Params"
+        },
+        "query": {
+          "maxLength": 10000,
+          "minLength": 1,
+          "title": "Query",
+          "type": "string"
+        }
+      },
+      "required": [
+        "connection",
+        "query"
+      ],
+      "title": "sql_run_queryArguments",
+      "type": "object"
+    },
+    "name": "sql_run_query"
+  }
+]
